@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Discord-like font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 36 57 63;
+    --surface: 47 49 54;
+    --surface-hover: 41 43 47;
+    --text: 220 221 222;
+    --text-secondary: 185 187 190;
+    --text-muted: 114 118 125;
+    --primary: 88 101 242;
+    --success: 59 165 92;
+    --warning: 250 168 26;
+    --danger: 237 66 69;
+    --border: 32 34 37;
+    --accent: 79 84 92;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  html {
+    @apply h-full;
+  }
+
+  body {
+    @apply h-full bg-background text-text font-sans antialiased;
+  }
+}
+
+@layer components {
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface-hover rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent;
+  }
+
+  /* Button styles */
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  .btn-primary {
+    @apply bg-primary hover:bg-primary/90 text-white focus:ring-primary;
+  }
+
+  .btn-secondary {
+    @apply bg-surface hover:bg-surface-hover text-text focus:ring-accent;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent hover:bg-surface-hover text-text focus:ring-accent;
+  }
+
+  .btn-danger {
+    @apply bg-danger hover:bg-danger/90 text-white focus:ring-danger;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-lg;
+  }
+
+  /* Input styles */
+  .input {
+    @apply px-3 py-2 bg-surface border border-border rounded-md text-text placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
+  }
+
+  .input-error {
+    @apply border-danger focus:ring-danger;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-surface rounded-lg shadow-elevation-medium border border-border;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:bg-surface-hover hover:shadow-elevation-high;
+  }
+
+  /* Avatar styles */
+  .avatar {
+    @apply rounded-full bg-accent flex items-center justify-center text-text font-medium;
+  }
+
+  .avatar-online {
+    @apply relative;
+  }
+
+  .avatar-online::after {
+    content: '';
+    @apply absolute bottom-0 right-0 w-3 h-3 bg-online border-2 border-background rounded-full;
+  }
+
+  .avatar-idle::after {
+    content: '';
+    @apply absolute bottom-0 right-0 w-3 h-3 bg-idle border-2 border-background rounded-full;
+  }
+
+  .avatar-dnd::after {
+    content: '';
+    @apply absolute bottom-0 right-0 w-3 h-3 bg-dnd border-2 border-background rounded-full;
+  }
+
+  /* Status indicators */
+  .status-indicator {
+    @apply w-3 h-3 rounded-full border-2 border-background;
+  }
+
+  .status-online {
+    @apply bg-online;
+  }
+
+  .status-idle {
+    @apply bg-idle;
+  }
+
+  .status-dnd {
+    @apply bg-dnd;
+  }
+
+  .status-offline {
+    @apply bg-offline;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent;
+  }
+
+  .glass-effect {
+    @apply bg-surface/80 backdrop-blur-sm border border-border/50;
+  }
+}
