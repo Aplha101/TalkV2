@@ -42,13 +42,23 @@ requiredFiles.forEach(file => {
 console.log('\n📦 Checking package.json structure...');
 try {
   const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const requiredDeps = ['next', 'react', 'next-auth', '@prisma/client', 'prisma', 'bcryptjs', 'zod'];
+  const requiredDeps = ['next', 'react', 'next-auth', '@prisma/client', 'bcryptjs', 'zod'];
+  const requiredDevDeps = ['prisma', 'typescript', 'tailwindcss'];
 
   requiredDeps.forEach(dep => {
     if (packageJson.dependencies[dep]) {
       console.log(`  ✅ ${dep}: ${packageJson.dependencies[dep]}`);
     } else {
       console.log(`  ❌ ${dep} - MISSING`);
+      allFilesExist = false;
+    }
+  });
+
+  requiredDevDeps.forEach(dep => {
+    if (packageJson.devDependencies[dep]) {
+      console.log(`  ✅ ${dep} (dev): ${packageJson.devDependencies[dep]}`);
+    } else {
+      console.log(`  ❌ ${dep} (dev) - MISSING`);
       allFilesExist = false;
     }
   });
