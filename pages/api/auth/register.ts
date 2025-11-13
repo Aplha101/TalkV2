@@ -2,15 +2,63 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 import { hashPassword, generateUsername, isEmailAllowed, sanitizeInput } from '@/lib/auth';
 import { signUpSchema } from '@/lib/schemas';
+import { rateLimiters, applySecurityHeaders, applyCorsHeaders, validateOrigin, logSecurityEvent, detectSuspiciousActivity } from '@/lib/security';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // Apply security headers
+  applySecurityHeaders(res);
+  applyCorsHeaders(res);
+
+  // Validate origin
+  if (!validateOrigin(req)) {
+    logSecurityEvent('CORS_VIOLATION', {
+      ip: req.headers['x-forwarded-for'] as string,
+      userAgent: req.headers['user-agent'],
+      path: req.url,
+      method: req.method,
+    });
+    return res.status(403).json({
+      success: false,
+      error: 'Forbidden',
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({
       success: false,
       error: 'Method not allowed',
+    });
+  }
+
+  // Apply rate limiting
+  const rateLimitResult = await rateLimiters.auth(req, res);
+  if (!rateLimitResult.success) {
+    logSecurityEvent('RATE_LIMIT_EXCEEDED', {
+      ip: req.headers['x-forwarded-for'] as string,
+      userAgent: req.headers['user-agent'],
+      path: req.url,
+      method: req.method,
+      message: `Registration rate limit exceeded: ${rateLimitResult.remaining}/${rateLimitResult.limit} remaining`,
+    });
+    return res.status(429).json({
+      success: false,
+      error: 'Too many registration attempts. Please try again later.',
+      retryAfter: Math.ceil((rateLimitResult.resetTime.getTime() - Date.now()) / 1000),
+    });
+  }
+
+  // Detect suspicious activity
+  const suspiciousCheck = detectSuspiciousActivity(req);
+  if (suspiciousCheck.isSuspicious) {
+    logSecurityEvent('SUSPICIOUS_ACTIVITY', {
+      ip: req.headers['x-forwarded-for'] as string,
+      userAgent: req.headers['user-agent'],
+      path: req.url,
+      method: req.method,
+      message: `Suspicious activity detected: ${suspiciousCheck.reasons.join(', ')}`,
     });
   }
 
